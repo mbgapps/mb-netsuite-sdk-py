@@ -4,16 +4,16 @@ with open('README.md', 'r') as f:
     long_description = f.read()
 
 setuptools.setup(
-    name='netsuitesdk',
-    version='2.5.0',
-    author='Siva Narayanan',
-    author_email='siva@fyle.in',
+    name='ucnetsuitesdk',
+    version='1.0.3,
+    author='Underground Cellar',
+    author_email='support@undergroundcellar.com',
     description='Python SDK for accessing the NetSuite SOAP webservice',
     license='MIT',
     long_description=long_description,
     long_description_content_type='text/markdown',
     keywords=['netsuite', 'api', 'python', 'sdk'],
-    url='https://github.com/fylein/netsuite-sdk-py',
+    url='https://github.com/mattclark-uc/netsuite-sdk-py',
     packages=setuptools.find_packages(),
     install_requires=['zeep'],
     classifiers=[
