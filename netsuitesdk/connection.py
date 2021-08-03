@@ -22,6 +22,9 @@ from .api.invoices import Invoices
 from .api.terms import Terms
 from .api.itemfulfillments import ItemFulfillments
 from .api.salesorders import SalesOrders
+from .api.inventoryitems import InventoryItems
+from .api.inventoryitembinnumberlist import InventoryItemBinNumberList
+from .api.inventoryitembinnumber import InventoryItemBinNumber
 from .internal.client import NetSuiteClient
 
 
@@ -63,3 +66,6 @@ class NetSuiteConnection:
         self.terms = Terms(ns_client)
         self.itemfulfillments = ItemFulfillments(ns_client)
         self.salesorders = SalesOrders(ns_client)
+        self.inventoryitems = InventoryItems(ns_client)
+        self.inventoryitembinnumberlist = InventoryItemBinNumberList(ns_client)
+        self.inventoryitembinnumber = InventoryItemBinNumber(ns_client)
