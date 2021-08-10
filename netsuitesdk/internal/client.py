@@ -11,6 +11,7 @@ import os.path
 import random
 import time
 import requests
+from requests.sessions import HTTPAdapter
 
 from zeep import Client
 from zeep.cache import SqliteCache
@@ -67,9 +68,8 @@ class NetSuiteClient:
             path = os.path.join(base_path, 'cache.db')
             timeout = caching_timeout
             cache = SqliteCache(path=path, timeout=timeout)
-            session = requests.Session()
-            session.keep_alive = False
-            transport = Transport(cache=cache, operation_timeout=60, session=session)
+            transport = Transport(cache=cache, operation_timeout=60)
+            transport.session.headers.update({"Connection": "close"})
         else:
             transport = None
 
