@@ -10,8 +10,6 @@ import logging
 import os.path
 import random
 import time
-import requests
-from requests.sessions import HTTPAdapter
 
 from zeep import Client
 from zeep.cache import SqliteCache
