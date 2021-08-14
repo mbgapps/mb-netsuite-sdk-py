@@ -1,11 +1,13 @@
 import setuptools
+from version import VERSION
+
 
 with open('README.md', 'r') as f:
     long_description = f.read()
 
 setuptools.setup(
     name='ucnetsuitesdk',
-    version='1.0.20',
+    version=VERSION,
     author='Underground Cellar',
     author_email='support@undergroundcellar.com',
     description='Python SDK for accessing the NetSuite SOAP webservice',
