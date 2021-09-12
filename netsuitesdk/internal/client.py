@@ -21,6 +21,7 @@ from .constants import *
 from .exceptions import *
 from .netsuite_types import *
 
+from .logging_plugin import LoggingPlugin
 
 class NetSuiteClient:
     """The Netsuite client class providing access to the Netsuite
@@ -41,7 +42,7 @@ class NetSuiteClient:
     _app_id = None
 
     def __init__(self, account=None, caching=True, caching_timeout=2592000, caching_path=None, search_body_fields_only=True,
-                 page_size: int = 100):
+                 page_size: int = 1000, api_recorder=None):
         """
         Initialize the Zeep SOAP client, parse the xsd specifications
         of Netsuite and store the complex types as attributes of this
@@ -72,7 +73,7 @@ class NetSuiteClient:
             transport = None
 
         # Initialize the Zeep Client
-        self._client = Client(self._wsdl_url, transport=transport)
+        self._client = Client(self._wsdl_url, transport=transport, plugins=[])
 
         # default service points to wrong data center. need to create a new service proxy and replace the default one
         self._service_proxy = self._client.create_service(
@@ -340,8 +341,9 @@ class NetSuiteClient:
         # call the service:
         include_search_preferences = (name == 'search')
         response = method(*args,
-                          _soapheaders=self._build_soap_headers(include_search_preferences=include_search_preferences)
-                          , **kwargs)
+                        _soapheaders=self._build_soap_headers(include_search_preferences=include_search_preferences)
+                        , **kwargs)
+
         return response
 
     def get(self, recordType, internalId=None, externalId=None):

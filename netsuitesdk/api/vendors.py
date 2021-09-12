@@ -80,6 +80,7 @@ class Vendors(ApiBase):
     ]
 
     RECORD_REF_FIELDS = [
+        'currency',
         'category',
         'customForm',
         'defaultTaxReg',
@@ -99,13 +100,13 @@ class Vendors(ApiBase):
         assert data['externalId'], 'missing external id'
         vendor = self.ns_client.Vendor(externalId=data['externalId'])
 
-        vendor['currency'] = self.ns_client.RecordRef(**(data['currency']))
+        if 'subsidiary' in data:
+            vendor['subsidiary'] = self.ns_client.RecordRef(**(data['subsidiary']))
+        else:
+            vendor['subsidiary'] = self.ns_client.RecordRef(**({'internalId': 1}))
 
-        vendor['subsidiary'] = self.ns_client.RecordRef(**(data['subsidiary']))
-
-        vendor['representingSubsidiary'] = self.ns_client.RecordRef(**(data['representingSubsidiary']))
-
-        vendor['workCalendar'] = self.ns_client.RecordRef(**(data['workCalendar']))
+        if 'representingSubsidiary' in data:
+            vendor['representingSubsidiary'] = self.ns_client.RecordRef(**(data['representingSubsidiary']))
 
         self.build_simple_fields(self.SIMPLE_FIELDS, data, vendor)
 
