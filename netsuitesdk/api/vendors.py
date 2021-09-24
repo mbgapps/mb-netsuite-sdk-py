@@ -21,7 +21,6 @@ class Vendors(ApiBase):
         'companyName',
         'creditLimit',
         'currencyList',
-        'customFieldList',
         'dateCreated',
         'defaultAddress',
         'eligibleForCommission',
@@ -93,24 +92,44 @@ class Vendors(ApiBase):
         'terms',
     ]
 
+    READ_ONLY_FIELDS = [
+        'internalId',
+        'balance',
+        'defaultAddress',
+        'balancePrimary',
+        'unbilledOrdersPrimary',
+        'currencyList'
+    ]
+
     def __init__(self, ns_client):
         ApiBase.__init__(self, ns_client=ns_client, type_name='Vendor')
+
+    def blank(self, externalId) -> OrderedDict:
+
+        blank = OrderedDict()
+        blank.externalId = externalId
+        blank.customFieldList = self.ns_client.CustomFieldList([])
+        blank.subsidiary = self.ns_client.RecordRef(**({'internalId': 2}))
+
+        return blank
+
 
     def post(self, data) -> OrderedDict:
         assert data['externalId'], 'missing external id'
         vendor = self.ns_client.Vendor(externalId=data['externalId'])
 
-        if 'subsidiary' in data:
+        self.remove_readonly(data, self.READ_ONLY_FIELDS)
+
+        if 'subsidiary' in data and data['subsidiary'] is not None:
             vendor['subsidiary'] = self.ns_client.RecordRef(**(data['subsidiary']))
         else:
             vendor['subsidiary'] = self.ns_client.RecordRef(**({'internalId': 1}))
 
-        if 'representingSubsidiary' in data:
-            vendor['representingSubsidiary'] = self.ns_client.RecordRef(**(data['representingSubsidiary']))
-
         self.build_simple_fields(self.SIMPLE_FIELDS, data, vendor)
 
         self.build_record_ref_fields(self.RECORD_REF_FIELDS, data, vendor)
+        
+        self.build_custom_fields(data, vendor)
 
         logger.debug('able to create vendor = %s', vendor)
         res = self.ns_client.upsert(vendor)

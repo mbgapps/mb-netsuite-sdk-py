@@ -163,7 +163,15 @@ class ApiBase:
                         value=field['value']
                     )
                 )
-
+            elif isinstance(field['value'], dict) and ('externalId' in field['value'] or
+                            'internalId' in field['value']):
+                custom_fields.append(
+                    self.ns_client.SelectCustomFieldRef(
+                        scriptId=field['scriptId'] if 'scriptId' in field else None,
+                        internalId=field['internalId'] if 'internalId' in field else None,
+                        value=field['value']
+                    )
+                )
             else:
                 custom_fields.append(
                     self.ns_client.StringCustomFieldRef(
@@ -180,6 +188,15 @@ class ApiBase:
             if key in dir(data):
                 data[key] = None
 
+
+    def delete(self, recordType, internalId):
+        itemref = self.ns_client.RecordRef(type=recordType, internalId=internalId)
+        result = self.ns_client.request('delete', baseRef=itemref)
+        if result.body['writeResponse']['status']['isSuccess']:
+            return True
+        else:
+            messages = ', '.join(sd.message for sd in result.body['writeResponse']['status']['statusDetail'])
+            raise Exception(messages)
 
 
 

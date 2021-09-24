@@ -58,7 +58,7 @@ class CustomerRefunds(ApiBase):
     READ_ONLY_FIELDS = ['internalId', 'balance', 'overdueBalance', 'representingSubsidiary',
                         'monthlyClosing', 'balance', 'overdueBalance', 'unbilledOrders', 'depositBalance',
                         'aging', 'aging1', 'aging2', 'aging3', 'aging4', 'lastModifiedDate', 'dateCreated',
-                        'defaultAddress', 'entityStatus', 'receivablesAccount',
+                        'defaultAddress', 'entityStatus', 'receivablesAccount', 'total', 'exchangeRate', 
                         'currencyList']
 
 
@@ -76,15 +76,17 @@ class CustomerRefunds(ApiBase):
 
         return blank
 
-    def create_from_deposit(self, internal_id):
+    def create_for_customer(self, customer_id):
 
-        rref = self.ns_client.RecordRef(**({'internalId': str(internal_id),
-                                            'type': 'customerDeposit'}))
-        init_ref = self.ns_client.InitializeRef(type='customerDeposit', internalId=str(internal_id))
+        init_ref = self.ns_client.InitializeRef(type='customer', externalId=str(customer_id))
         init_rec = self.ns_client.InitializeRecord(type='customerRefund', reference=init_ref)
-        refund = self.ns_client.request('initialize', initializeRecord=init_rec)
+        response = self.ns_client.request('initialize', initializeRecord=init_rec)
 
-        return refund
+        if not response.body.readResponse.status.isSuccess:
+            message = ', '.join(str(sd.message) for sd in response.body.readResponse.status.statusDetail)
+            raise Exception(message)
+        
+        return response.body.readResponse.record
 
     def get_from_deposits(self, internal_ids):
 
@@ -120,6 +122,9 @@ class CustomerRefunds(ApiBase):
         self.build_custom_fields(data, customerrefund)
 
         self.remove_readonly(customerrefund,self.READ_ONLY_FIELDS)
+
+        if not customerrefund.paymentMethod:
+            customerrefund.paymentMethod = self.ns_client.RecordRef(**{'internalId': '1'})
 
         if hasattr(data, 'applyList'):
             customerrefund.applyList = data.applyList

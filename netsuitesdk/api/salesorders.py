@@ -73,7 +73,8 @@ class SalesOrders(ApiBase):
         'taxRate',
         'taxTotal',
         'total',
-        'totalCostEstimate'
+        'totalCostEstimate',
+        'itemList'
     ]
 
     RECORD_REF_FIELDS = [
@@ -145,5 +146,4 @@ class SalesOrders(ApiBase):
                 for field in self.READ_ONLY_ITEM_FIELDS:
                     item[field] = None
 
-        logger.info('able to create salesorder = %s', sales_order)
         return self.ns_client.upsert(sales_order)
