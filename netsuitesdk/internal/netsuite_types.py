@@ -115,7 +115,10 @@ COMPLEX_TYPES = {
         'VendorPaymentApplyList',
         'VendorPaymentCredit',
         'VendorPaymentCreditList',
-        'VendorPaymentApply'
+        'VendorPaymentApply',
+        'PurchaseOrder',
+        'ItemReceipt',
+        'PurchaseOrderItemList'
     ],
 
     # urn:customers_2019_1.transactions.webservices.netsuite.com

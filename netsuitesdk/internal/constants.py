@@ -1,6 +1,7 @@
 
 
 SEARCH_RECORD_TYPES = [
+    'invoice',
     'account',
     'accountingPeriod',
     'accountingTransaction',

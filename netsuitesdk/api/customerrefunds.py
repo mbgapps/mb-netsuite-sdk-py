@@ -59,7 +59,7 @@ class CustomerRefunds(ApiBase):
                         'monthlyClosing', 'balance', 'overdueBalance', 'unbilledOrders', 'depositBalance',
                         'aging', 'aging1', 'aging2', 'aging3', 'aging4', 'lastModifiedDate', 'dateCreated',
                         'defaultAddress', 'entityStatus', 'receivablesAccount', 'total', 'exchangeRate', 
-                        'currencyList']
+                        'currencyList', 'createdDate']
 
 
     def __init__(self, ns_client):

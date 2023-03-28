@@ -1,3 +1,4 @@
+from typing import OrderedDict
 from netsuitesdk.internal.utils import PaginatedSearch
 from .base import ApiBase
 import logging
@@ -5,6 +6,67 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CustomerDeposits(ApiBase):
+
+    READ_ONLY_FIELDS = [
+        'createdDate',
+        'lastModifiedDate',
+        'subTotal',
+        'tranId',
+        'discountTotal',
+        'giftCertApplied',
+        'total',
+        'exchangeRate',
+        'currency'
+    ]
+
+    RECORD_REF_FIELDS = [
+        'account',
+        'class',
+        'creditCard',
+        'creditCardProcessor',
+        'currency',
+        'customer',
+        'customForm',
+        'department',
+        'location',
+        'paymentMethod',
+        'postingPeriod',
+        'salesOrder',
+        'subsidiary',
+    ]
+
+    SIMPLE_FIELDS = [
+        'ccApproved',
+        'ccIsPurchaseCardBin',
+        'ccProcessAsPurchaseCard',
+        'chargeIt',
+        'ignoreAvs',
+        'isRecurringPayment',
+        'undepFunds',
+        'applyList',
+        'ccExpireDate',
+        'createdDate',
+        'lastModifiedDate',
+        'tranDate',
+        'validFrom',
+        'exchangeRate',
+        'payment',
+        'authCode',
+        'ccName',
+        'ccNumber',
+        'ccSecurityCode',
+        'ccStreet',
+        'ccZipCode',
+        'checkNum',
+        'currencyName',
+        'debitCardIssueNo',
+        'memo',
+        'pnRefNum',
+        'softDescriptor',
+        'status',
+        'threeDStatusCode',
+        'payment'
+    ]
 
     def __init__(self, ns_client):
         ApiBase.__init__(self, ns_client=ns_client, type_name='CustomerDeposit')
@@ -35,3 +97,19 @@ class CustomerDeposits(ApiBase):
 
     def delete(self, internalId):
         return super().delete('customerDeposit', internalId)
+
+    def post(self, data) -> OrderedDict:
+
+        customer_deposit = self.ns_client.CustomerDeposit(externalId=data['externalId'])
+
+        self.build_simple_fields(self.SIMPLE_FIELDS, data, customer_deposit)
+
+        self.build_record_ref_fields(self.RECORD_REF_FIELDS, data, customer_deposit)
+    
+        self.build_custom_fields(data, customer_deposit)
+
+        self.remove_readonly(customer_deposit, self.READ_ONLY_FIELDS)
+
+        logger.debug('able to create customer = %s', customer_deposit)
+        res = self.ns_client.upsert(customer_deposit)
+        return self._serialize(res)

@@ -2,8 +2,8 @@ import zeep
 import logging
 from typing import List
 from datetime import datetime
-from collections import OrderedDict, Mapping
-
+from collections import OrderedDict
+from collections.abc import Mapping
 from netsuitesdk.internal.client import NetSuiteClient
 from netsuitesdk.internal.utils import PaginatedSearch
 
@@ -15,6 +15,7 @@ class ApiBase:
     def __init__(self, ns_client: NetSuiteClient, type_name):
         self.ns_client = ns_client
         self.type_name = type_name
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     def search(self, attribute, value, operator):
         """
@@ -56,6 +57,22 @@ class ApiBase:
     def get_ref(self, internalId=None, externalId=None) -> OrderedDict:
         return self._serialize(self.ns_client.RecordRef(type=self.type_name.lower(),
                                                         internalId=internalId, externalId=externalId))
+
+    def get_list(self, ids):
+
+        result = self.ns_client.request('getList',
+                                        baseRef=[self.ns_client.RecordRef(**({'internalId': id, 'type': self.type_name})) for id in ids])
+        if result.body.readResponseList.status.isSuccess:
+            rows = []
+            for row in result.body.readResponseList.readResponse:
+                if row.status.isSuccess:
+                    rows.append(row.record)
+                else:
+                    self.logger.error(f'Error from NetSuite: {row.status.statusDetail[0].message}')
+            return rows
+        else:
+            raise Exception(f'Error from NetSuite: {result.body.readResponseList.status.statusDetail}')
+
 
     def post(self, data) -> OrderedDict:
         raise NotImplementedError('post method not implemented')
@@ -146,6 +163,8 @@ class ApiBase:
 
     def build_custom_fields(self, data, customer):
         custom_fields = []
+        if not hasattr(data, 'customFieldList') or data.customFieldList is None:
+            return 
         for field in data.customFieldList['customField']:
             if isinstance(field['value'], datetime):
                 custom_fields.append(

@@ -1,3 +1,4 @@
+from .api.purchaseorders import PurchaseOrders
 from .api.accounts import Accounts
 from .api.classifications import Classifications
 from .api.departments import Departments
@@ -78,3 +79,4 @@ class NetSuiteConnection:
         self.cashsales = CashSales(ns_client)
         self.cashrefunds = CashRefunds(ns_client)
         self.customerdeposits = CustomerDeposits(ns_client)
+        self.purchaseorders = PurchaseOrders(ns_client)
