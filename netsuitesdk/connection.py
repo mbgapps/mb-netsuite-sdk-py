@@ -1,3 +1,4 @@
+from .api.purchaseorders import PurchaseOrders
 from .api.accounts import Accounts
 from .api.classifications import Classifications
 from .api.departments import Departments
@@ -25,13 +26,17 @@ from .api.salesorders import SalesOrders
 from .api.inventoryitems import InventoryItems
 from .api.inventoryitembinnumberlist import InventoryItemBinNumberList
 from .api.inventoryitembinnumber import InventoryItemBinNumber
+from .api.customerrefunds import CustomerRefunds
+from .api.cashsales import CashSales
+from .api.cashrefunds import CashRefunds
+from .api.customerdeposits import CustomerDeposits
 from .internal.client import NetSuiteClient
 
 
 class NetSuiteConnection:
     def __init__(self, account, consumer_key, consumer_secret, token_key, token_secret,
                  caching=True, caching_timeout=2592000, caching_path=None,
-                 search_body_fields_only=True, page_size: int = 100):
+                 search_body_fields_only=True, page_size: int = 1000, api_recorder=None):
         ns_client = NetSuiteClient(account=account, caching=caching, caching_timeout=caching_timeout,
                                    caching_path=caching_path, search_body_fields_only=search_body_fields_only,
                                    page_size=page_size)
@@ -42,6 +47,7 @@ class NetSuiteConnection:
             token_secret=token_secret
         )
         self.client = ns_client
+        self.api_recorder = api_recorder
         self.accounts = Accounts(ns_client)
         self.classifications = Classifications(ns_client)
         self.departments = Departments(ns_client)
@@ -69,3 +75,8 @@ class NetSuiteConnection:
         self.inventoryitems = InventoryItems(ns_client)
         self.inventoryitembinnumberlist = InventoryItemBinNumberList(ns_client)
         self.inventoryitembinnumber = InventoryItemBinNumber(ns_client)
+        self.customerrefunds = CustomerRefunds(ns_client)
+        self.cashsales = CashSales(ns_client)
+        self.cashrefunds = CashRefunds(ns_client)
+        self.customerdeposits = CustomerDeposits(ns_client)
+        self.purchaseorders = PurchaseOrders(ns_client)

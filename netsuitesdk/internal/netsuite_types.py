@@ -29,7 +29,9 @@ COMPLEX_TYPES = {
         'StringCustomFieldRef',
         'CustomRecordRef',
         'SelectCustomFieldRef',
-        'BooleanCustomFieldRef'
+        'BooleanCustomFieldRef',
+        'InitializeRecord',
+        'InitializeRef'
     ],
 
     # ns4: https://webservices.netsuite.com/xsd/platform/v2017_2_0/messages.xsd
@@ -42,7 +44,10 @@ COMPLEX_TYPES = {
         'PartnerInfo',
         'ReadResponse',
         'SearchPreferences',
-        'SearchResponse'
+        'SearchResponse',
+        'DeleteRequest',
+        'DeleteListRequest',
+        'InitializeRequest'
     ],
 
     # https://webservices.netsuite.com/xsd/platform/v2017_2_0/common.xsd
@@ -92,7 +97,10 @@ COMPLEX_TYPES = {
         'Invoice',
         'InvoiceItem',
         'InvoiceItemList',
-        'TransactionSearch'
+        'TransactionSearch',
+        'ItemFulfillment',
+        'SalesOrder',
+        'CashSale'
     ],
 
     # urn:purchases_2017_2.transactions.webservices.netsuite.com
@@ -107,7 +115,17 @@ COMPLEX_TYPES = {
         'VendorPaymentApplyList',
         'VendorPaymentCredit',
         'VendorPaymentCreditList',
-        'VendorPaymentApply'
+        'VendorPaymentApply',
+        'PurchaseOrder',
+        'ItemReceipt',
+        'PurchaseOrderItemList'
+    ],
+
+    # urn:customers_2019_1.transactions.webservices.netsuite.com
+    'ns23': [
+        'CustomerRefund', 'CustomerRefundApply', 'CustomerRefundApplyList', 'CustomerRefundDeposit',
+        'CustomerRefundDepositList', 'CustomerDeposit', 'CustomerDepositApply', 'CustomerDepositApplyList',
+        'CashRefund'
     ],
 
     # urn:general_2019_2.transactions.webservices.netsuite.com
@@ -156,6 +174,6 @@ SIMPLE_TYPES = {
         'SearchEnumMultiSelectFieldOperator',
         'SearchStringFieldOperator',
         'SearchDateFieldOperator',
-        'SearchLongFieldOperator',
+        'SearchLongFieldOperator'
     ],
 }

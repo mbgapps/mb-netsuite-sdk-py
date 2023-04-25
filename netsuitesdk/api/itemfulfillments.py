@@ -3,7 +3,6 @@ from sqlite3.dbapi2 import Date
 
 from .base import ApiBase
 import logging
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +83,20 @@ class ItemFulfillments(ApiBase):
         'transferLocation'   
     ]
 
+    READ_ONLY_FIELDS = [
+        'lastModifiedDate',
+        'createdDate',
+        'homeDeliveryDateFedEx',
+        'shipDateFedEx',
+        'tranId',
+        'tranDate',
+        'internalId'
+    ]
 
     def __init__(self, ns_client):
         ApiBase.__init__(self, ns_client=ns_client, type_name='ItemFulfillment')
+
+    def update(self, data) -> OrderedDict:
+        data.internalId = None
+        res = self.ns_client.upsert(data)
+        return self._serialize(res)
