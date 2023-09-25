@@ -74,7 +74,8 @@ class SalesOrders(ApiBase):
         'taxTotal',
         'total',
         'totalCostEstimate',
-        'itemList'
+        'itemList',
+        'memo'
     ]
 
     RECORD_REF_FIELDS = [
@@ -124,18 +125,21 @@ class SalesOrders(ApiBase):
     def __init__(self, ns_client):
         ApiBase.__init__(self, ns_client=ns_client, type_name='SalesOrder')
 
+    def get(self, id):
+        return self.ns_client.get('SalesOrder', internalId=id)
+        # return self.ns_client.SalesOrder(internalId=id)
 
-    def post(self, data) -> OrderedDict:
-        if data.externalId in ['', None, 0, [], {}]:
+    def post(self, externalId, data) -> OrderedDict:
+        if externalId in ['', None, 0, [], {}]:
             raise ValueError("externalId is required")
+        
+        sales_order = self.ns_client.SalesOrder(externalId=externalId)
 
-        sales_order = self.ns_client.SalesOrder(externalId=data.externalId)
-
-        self.build_simple_fields(self.SIMPLE_FIELDS, data, sales_order)
+        self.build_mb_simple_fields(self.SIMPLE_FIELDS, data, sales_order)
 
         self.build_record_ref_fields(self.RECORD_REF_FIELDS, data, sales_order)
 
-        #self.build_custom_fields(data, sales_order)
+        self.build_custom_fields(data, sales_order)
 
         self.remove_readonly(sales_order, self.READ_ONLY_FIELDS)
 

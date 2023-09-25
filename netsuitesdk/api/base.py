@@ -148,6 +148,11 @@ class ApiBase:
         record = self.ns_client.get(recordType=self.type_name, internalId=internalId, externalId=externalId)
         return record
 
+    def build_mb_simple_fields(self, fields, source, target):
+        for field in fields:
+            if field in source:
+                target[field] = source[field]
+
     def build_simple_fields(self, fields, source, target):
         for field in fields:
             if field in dir(source):
