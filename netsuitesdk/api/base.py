@@ -153,6 +153,57 @@ class ApiBase:
             if field in source:
                 target[field] = source[field]
 
+    def build_mb_record_ref_fields(self, fields, source, target):
+        for field in fields:
+            if field in source and source[field] is not None:
+                if isinstance(source[field],Mapping):
+                    target[field] = self.ns_client.RecordRef(**(source[field]))
+                else:
+                    target[field] = source[field]
+
+    def build_mb_custom_fields(self, data, customer):
+        custom_fields = []
+
+        if data['customFieldList'] is None:
+            return 
+
+        for field in data['customFieldList']['customField']:
+            if isinstance(field['value'], datetime):
+                custom_fields.append(
+                    self.ns_client.DateCustomFieldRef(
+                        scriptId=field['scriptId'] if 'scriptId' in field else None,
+                        internalId=field['internalId'] if 'internalId' in field else None,
+                        value=field['value']
+                    )
+                )
+            elif isinstance(field['value'], bool):
+                custom_fields.append(
+                    self.ns_client.BooleanCustomFieldRef(
+                        scriptId=field['scriptId'] if 'scriptId' in field else None,
+                        internalId=field['internalId'] if 'internalId' in field else None,
+                        value=field['value']
+                    )
+                )
+            elif isinstance(field['value'], dict) and ('externalId' in field['value'] or
+                            'internalId' in field['value']):
+                custom_fields.append(
+                    self.ns_client.SelectCustomFieldRef(
+                        scriptId=field['scriptId'] if 'scriptId' in field else None,
+                        internalId=field['internalId'] if 'internalId' in field else None,
+                        value=field['value']
+                    )
+                )
+            else:
+                custom_fields.append(
+                    self.ns_client.StringCustomFieldRef(
+                        scriptId=field['scriptId'] if 'scriptId' in field else None,
+                        internalId=field['internalId'] if 'internalId' in field else None,
+                        value=field['value']
+                    )
+                )
+
+        customer['customFieldList'] = self.ns_client.CustomFieldList(custom_fields)
+
     def build_simple_fields(self, fields, source, target):
         for field in fields:
             if field in dir(source):
