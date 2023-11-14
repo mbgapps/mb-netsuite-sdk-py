@@ -76,6 +76,7 @@ class SalesOrders(ApiBase):
         # 'taxTotal',
         'total',
         # 'totalCostEstimate',
+        'otherRefNum',
         'status',
         'itemList',
         'memo',
