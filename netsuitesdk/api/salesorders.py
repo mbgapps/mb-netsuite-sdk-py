@@ -163,6 +163,7 @@ class SalesOrders(ApiBase):
             sales_order.itemList = data['itemList']
 
             for item in data['itemList']['item']:
+                self.build_mb_custom_fields(item, item)
                 for field in self.READ_ONLY_ITEM_FIELDS:
                     item[field] = None
 
