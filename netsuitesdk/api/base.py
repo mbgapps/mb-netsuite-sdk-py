@@ -161,6 +161,9 @@ class ApiBase:
                 else:
                     target[field] = source[field]
 
+    def build_mb_record_ref(self, field):
+        return self.ns_client.RecordRef(field)
+
     def build_mb_custom_fields(self, data, customer):
         custom_fields = []
 

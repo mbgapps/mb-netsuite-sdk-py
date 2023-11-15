@@ -136,6 +136,17 @@ class SalesOrders(ApiBase):
         'quantityPicked'
     ]
 
+    SIMPLE_ITEM_FIELDS = [
+        'amount',
+        'quantity',
+        'internalId'
+    ]
+
+    RECORD_REF_ITEM_FIELDS = [
+        'item',
+        'location',
+    ]
+
     def __init__(self, ns_client):
         ApiBase.__init__(self, ns_client=ns_client, type_name='SalesOrder')
 
@@ -152,9 +163,7 @@ class SalesOrders(ApiBase):
         sales_order = self.ns_client.SalesOrder(externalId=externalId)
 
         self.build_mb_simple_fields(self.SIMPLE_FIELDS, data, sales_order)
-
         self.build_mb_record_ref_fields(self.RECORD_REF_FIELDS, data, sales_order)
-
         self.build_mb_custom_fields(data, sales_order)
 
         # self.remove_readonly(sales_order, self.READ_ONLY_FIELDS)
@@ -163,9 +172,13 @@ class SalesOrders(ApiBase):
             sales_order.itemList = data['itemList']
 
             for item in data['itemList']['item']:
-                self.build_mb_custom_fields(item, item)
-                for field in self.READ_ONLY_ITEM_FIELDS:
-                    item[field] = None
+                wsdl_item = self.build_mb_record_ref("item")
+                self.build_mb_simple_fields(self.SIMPLE_ITEM_FIELDS, item, wsdl_item)
+                self.build_mb_record_ref_fields(self.RECORD_REF_ITEM_FIELDS, item, wsdl_item)
+                self.build_mb_custom_fields(item, wsdl_item)
+                sales_order.itemList.append = wsdl_item
+                # for field in self.READ_ONLY_ITEM_FIELDS:
+                #     item[field] = None
 
         print(sales_order)
         return self.ns_client.upsert(sales_order)
