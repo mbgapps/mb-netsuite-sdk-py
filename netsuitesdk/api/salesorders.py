@@ -144,7 +144,8 @@ class SalesOrders(ApiBase):
 
     RECORD_REF_ITEM_FIELDS = [
         'item',
-        'location',
+        'inventorylocation',
+        'inventorysubsidiary',
     ]
 
     def __init__(self, ns_client):
