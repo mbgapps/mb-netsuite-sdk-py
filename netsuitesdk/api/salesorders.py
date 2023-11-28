@@ -182,6 +182,7 @@ class SalesOrders(ApiBase):
                 # for field in self.READ_ONLY_ITEM_FIELDS:
                 #     item[field] = None
 
+        import pdb; pdb.set_trace()
         print("****************************************************")
         print(sales_order)
         return self.ns_client.upsert(sales_order)
