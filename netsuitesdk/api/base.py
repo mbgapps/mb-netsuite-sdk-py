@@ -151,6 +151,8 @@ class ApiBase:
     def build_mb_simple_fields(self, fields, source, target):
         for field in fields:
             if field in source:
+                print(field)
+                print(source[field])
                 target[field] = source[field]
 
     def build_mb_record_ref_fields(self, fields, source, target):
