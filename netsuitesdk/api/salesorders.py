@@ -144,8 +144,8 @@ class SalesOrders(ApiBase):
 
     RECORD_REF_ITEM_FIELDS = [
         'item',
-        'inventorylocation',
-        'inventorysubsidiary',
+        'inventoryLocation',
+        'inventorySubsidiary',
     ]
 
     def __init__(self, ns_client):
@@ -162,6 +162,7 @@ class SalesOrders(ApiBase):
             raise ValueError("externalId is required")
         
         sales_order = self.ns_client.SalesOrder(externalId=externalId)
+        print(sales_order)
 
         self.build_mb_simple_fields(self.SIMPLE_FIELDS, data, sales_order)
         self.build_mb_record_ref_fields(self.RECORD_REF_FIELDS, data, sales_order)
