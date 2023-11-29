@@ -185,7 +185,6 @@ class SalesOrders(ApiBase):
 
             sales_order.itemList = self.ns_client.SalesOrderItemList(item=items)
 
-        # print(sales_order)
         try:
             exists = True
             self.ns_client.get('SalesOrder', externalId=externalId)
@@ -197,6 +196,11 @@ class SalesOrders(ApiBase):
                 self.logger.warning('Cancelled SalesOrder not found - not adding externalId {}'.format(externalId))
                 return None
 
+        # NS won't allow you to set order status to cancelled
+        if data['orderStatus'] == '_cancelled':
+            sales_order.orderStatus = None
+
+        # print(sales_order)
 
         if exists:
             return self.ns_client.update(sales_order)
