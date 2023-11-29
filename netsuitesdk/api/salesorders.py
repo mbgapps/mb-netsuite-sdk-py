@@ -162,27 +162,23 @@ class SalesOrders(ApiBase):
             raise ValueError("externalId is required")
         
         sales_order = self.ns_client.SalesOrder(externalId=externalId)
-        print(sales_order)
 
         self.build_mb_simple_fields(self.SIMPLE_FIELDS, data, sales_order)
         self.build_mb_record_ref_fields(self.RECORD_REF_FIELDS, data, sales_order)
         self.build_mb_custom_fields(data, sales_order)
-
-        # self.remove_readonly(sales_order, self.READ_ONLY_FIELDS)
+        self.remove_readonly(sales_order, self.READ_ONLY_FIELDS)
 
         if data['itemList']:
-            sales_order.itemList = data['itemList']
-
+            items = []
             for item in data['itemList']['item']:
-                wsdl_item = self.build_mb_record_ref("item")
+                # for field in self.READ_ONLY_ITEM_FIELDS:
+                #     item[field] = None
+                wsdl_item = self.ns_client.SalesOrderItem()
                 self.build_mb_simple_fields(self.SIMPLE_ITEM_FIELDS, item, wsdl_item)
                 self.build_mb_record_ref_fields(self.RECORD_REF_ITEM_FIELDS, item, wsdl_item)
                 self.build_mb_custom_fields(item, wsdl_item)
-                sales_order.itemList.append = wsdl_item
-                # for field in self.READ_ONLY_ITEM_FIELDS:
-                #     item[field] = None
+                items.append(wsdl_item)
 
-        import pdb; pdb.set_trace()
-        print("****************************************************")
-        print(sales_order)
+            sales_order.itemList = self.ns_client.SalesOrderItemList(item=items)
+
         return self.ns_client.upsert(sales_order)

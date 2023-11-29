@@ -100,6 +100,8 @@ COMPLEX_TYPES = {
         'TransactionSearch',
         'ItemFulfillment',
         'SalesOrder',
+        'SalesOrderItem',
+        'SalesOrderItemList',
         'CashSale'
     ],
 
