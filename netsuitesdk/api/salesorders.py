@@ -4,6 +4,7 @@ from sqlite3.dbapi2 import Date
 from .base import ApiBase
 import logging
 from datetime import datetime
+from netsuitesdk.internal.exceptions import NetSuiteRequestError
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,6 @@ class SalesOrders(ApiBase):
         'total',
         # 'totalCostEstimate',
         'otherRefNum',
-        'status',
         'itemList',
         'memo',
         'tranId'
@@ -123,7 +123,7 @@ class SalesOrders(ApiBase):
         # 'terms',
     ]
 
-    READ_ONLY_FIELDS = ['subTotal', 'balance', 'discountTotal', 'giftCertApplied', 'total', 'exchangeRate']
+    READ_ONLY_FIELDS = ['subTotal', 'balance', 'discountTotal', 'giftCertApplied', 'total', 'exchangeRate', 'status']
 
     READ_ONLY_ITEM_FIELDS = [
         'quantityAvailable', 
@@ -139,7 +139,8 @@ class SalesOrders(ApiBase):
     SIMPLE_ITEM_FIELDS = [
         'amount',
         'quantity',
-        'internalId'
+        'internalId',
+        'isClosed'
     ]
 
     RECORD_REF_ITEM_FIELDS = [
@@ -168,7 +169,10 @@ class SalesOrders(ApiBase):
         self.build_mb_custom_fields(data, sales_order)
         self.remove_readonly(sales_order, self.READ_ONLY_FIELDS)
 
-        if data['itemList']:
+        if 'orderStatus' in data:
+            sales_order.orderStatus = data['orderStatus']
+
+        if 'itemList' in data:
             items = []
             for item in data['itemList']['item']:
                 # for field in self.READ_ONLY_ITEM_FIELDS:
@@ -181,4 +185,20 @@ class SalesOrders(ApiBase):
 
             sales_order.itemList = self.ns_client.SalesOrderItemList(item=items)
 
-        return self.ns_client.upsert(sales_order)
+        # print(sales_order)
+        try:
+            exists = True
+            self.ns_client.get('SalesOrder', externalId=externalId)
+        except NetSuiteRequestError:
+            exists = False
+            self.logger.warning('SalesOrder not found for externalId {} - attempting to add it'.format(externalId))
+            # if sales order not found and the status is cancelled, just return and don't do anything
+            if data['orderStatus'] == '_cancelled':
+                self.logger.warning('Cancelled SalesOrder not found - not adding externalId {}'.format(externalId))
+                return None
+
+
+        if exists:
+            return self.ns_client.update(sales_order)
+        else:
+            return self.ns_client.add(sales_order)

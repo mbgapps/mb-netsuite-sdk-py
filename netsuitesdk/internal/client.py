@@ -506,6 +506,34 @@ class NetSuiteClient:
             exc = self._request_error('upsert', detail=status['statusDetail'][0])
             raise exc
 
+    def add(self, record):
+        response = self.request('add', record=record)
+        response = response.body.writeResponse
+        status = response.status
+        if status.isSuccess:
+            record_ref = response['baseRef']
+            self.logger.debug(
+                'Successfully updated record of internalId: {internalId}, externalId: {externalId}, response: {recordRef}'.format(
+                     internalId=record_ref['internalId'], externalId=record_ref['externalId'], recordRef=record_ref))
+            return record_ref
+        else:
+            exc = self._request_error('add', detail=status['statusDetail'][0])
+            raise exc
+
+    def update(self, record):
+        response = self.request('update', record=record)
+        response = response.body.writeResponse
+        status = response.status
+        if status.isSuccess:
+            record_ref = response['baseRef']
+            self.logger.debug(
+                'Successfully updated record of internalId: {internalId}, externalId: {externalId}, response: {recordRef}'.format(
+                     internalId=record_ref['internalId'], externalId=record_ref['externalId'], recordRef=record_ref))
+            return record_ref
+        else:
+            exc = self._request_error('update', detail=status['statusDetail'][0])
+            raise exc
+
     def basic_stringfield_search(self, type_name, attribute, value, operator=None):
         """
         Searches for an object of type `type_name` whose name contains `value`
