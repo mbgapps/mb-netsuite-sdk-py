@@ -22,13 +22,15 @@ from .exceptions import *
 from .netsuite_types import *
 
 from .logging_plugin import LoggingPlugin
+# import logging.config
+
 
 class NetSuiteClient:
     """The Netsuite client class providing access to the Netsuite
     SOAP/WSDL web service"""
 
-    WSDL_URL_TEMPLATE = 'https://{account}.suitetalk.api.netsuite.com/wsdl/v2019_1_0/netsuite.wsdl'
-    DATACENTER_URL_TEMPLATE = 'https://{account}.suitetalk.api.netsuite.com/services/NetSuitePort_2019_1'
+    WSDL_URL_TEMPLATE = 'https://{account}.suitetalk.api.netsuite.com/wsdl/v2023_2_0/netsuite.wsdl'
+    DATACENTER_URL_TEMPLATE = 'https://{account}.suitetalk.api.netsuite.com/services/NetSuitePort_2023_2'
 
     _search_preferences = None
     _passport = None
@@ -43,6 +45,30 @@ class NetSuiteClient:
 
     def __init__(self, account=None, caching=True, caching_timeout=2592000, caching_path=None, search_body_fields_only=True,
                  page_size: int = 1000, api_recorder=None):
+
+        # Uncomment to see SOAP request/response payloads
+        # logging.config.dictConfig({
+        #     'version': 1,
+        #     'formatters': {
+        #         'verbose': {
+        #             'format': '%(name)s: %(message)s'
+        #         }
+        #     },
+        #     'handlers': {
+        #         'console': {
+        #             'level': 'DEBUG',
+        #             'class': 'logging.StreamHandler',
+        #             'formatter': 'verbose',
+        #         },
+        #     },
+        #     'loggers': {
+        #         'zeep.transports': {
+        #             'level': 'DEBUG',
+        #             'propagate': True,
+        #             'handlers': ['console'],
+        #         },
+        #     }
+        # })
         """
         Initialize the Zeep SOAP client, parse the xsd specifications
         of Netsuite and store the complex types as attributes of this
@@ -77,7 +103,7 @@ class NetSuiteClient:
 
         # default service points to wrong data center. need to create a new service proxy and replace the default one
         self._service_proxy = self._client.create_service(
-            '{urn:platform_2019_1.webservices.netsuite.com}NetSuiteBinding', self._datacenter_url)
+            '{urn:platform_2023_2.webservices.netsuite.com}NetSuiteBinding', self._datacenter_url)
 
         # Parse all complex types specified in :const:`~netsuitesdk.netsuite_types.COMPLEX_TYPES`
         # and store them as attributes of this instance. Same for simple types.
@@ -343,7 +369,7 @@ class NetSuiteClient:
         response = method(*args,
                         _soapheaders=self._build_soap_headers(include_search_preferences=include_search_preferences)
                         , **kwargs)
-
+        
         return response
 
     def get(self, recordType, internalId=None, externalId=None):
