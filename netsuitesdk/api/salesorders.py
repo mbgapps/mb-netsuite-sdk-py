@@ -91,7 +91,7 @@ class SalesOrders(ApiBase):
         # 'creditCard',
         # 'creditCardProcessor',
         # 'currency',
-        # 'customForm',
+        'customForm',
         # 'department',
         # 'discountItem',
         # 'drAccount',
