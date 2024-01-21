@@ -202,9 +202,13 @@ class SalesOrders(ApiBase):
 
         # print(sales_order)
 
+        if exists and data['orderStatus'] != '_cancelled':
+            self.logger.warning('SalesOrder already exists - not adding externalId {}'.format(externalId))
+            return None
+
         if exists and data['orderStatus'] == '_cancelled':
             self.logger.warning('Cancelling SalesOrder for externalId {}'.format(externalId))
             sales_order.orderStatus = None
             return self.ns_client.update(sales_order)
-        elif data['orderStatus'] != '_cancelled':
+        else:
             return self.ns_client.add(sales_order)
