@@ -197,12 +197,14 @@ class SalesOrders(ApiBase):
                 return None
 
         # NS won't allow you to set order status to cancelled
-        if data['orderStatus'] == '_cancelled':
-            sales_order.orderStatus = None
+        # if data['orderStatus'] == '_cancelled':
+        #     sales_order.orderStatus = None
 
         # print(sales_order)
 
-        if exists:
+        if exists and data['orderStatus'] == '_cancelled':
+            self.logger.warning('Cancelling SalesOrder for externalId {}'.format(externalId))
+            sales_order.orderStatus = None
             return self.ns_client.update(sales_order)
         else:
             return self.ns_client.add(sales_order)
