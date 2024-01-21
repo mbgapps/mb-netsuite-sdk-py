@@ -206,5 +206,5 @@ class SalesOrders(ApiBase):
             self.logger.warning('Cancelling SalesOrder for externalId {}'.format(externalId))
             sales_order.orderStatus = None
             return self.ns_client.update(sales_order)
-        else:
+        elif data['orderStatus'] != '_cancelled':
             return self.ns_client.add(sales_order)
