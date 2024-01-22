@@ -212,3 +212,32 @@ class SalesOrders(ApiBase):
             return self.ns_client.update(sales_order)
         else:
             return self.ns_client.add(sales_order)
+
+    def update(self, externalId, data) -> OrderedDict:
+        if externalId in ['', None, 0, [], {}]:
+            raise ValueError("externalId is required")
+        
+        sales_order = self.ns_client.SalesOrder(externalId=externalId)
+
+        self.build_mb_simple_fields(self.SIMPLE_FIELDS, data, sales_order)
+        self.build_mb_record_ref_fields(self.RECORD_REF_FIELDS, data, sales_order)
+        self.build_mb_custom_fields(data, sales_order)
+        self.remove_readonly(sales_order, self.READ_ONLY_FIELDS)
+
+        if 'orderStatus' in data:
+            sales_order.orderStatus = data['orderStatus']
+
+        if 'itemList' in data:
+            items = []
+            for item in data['itemList']['item']:
+                # for field in self.READ_ONLY_ITEM_FIELDS:
+                #     item[field] = None
+                wsdl_item = self.ns_client.SalesOrderItem()
+                self.build_mb_simple_fields(self.SIMPLE_ITEM_FIELDS, item, wsdl_item)
+                self.build_mb_record_ref_fields(self.RECORD_REF_ITEM_FIELDS, item, wsdl_item)
+                self.build_mb_custom_fields(item, wsdl_item)
+                items.append(wsdl_item)
+
+            sales_order.itemList = self.ns_client.SalesOrderItemList(item=items)
+
+        return self.ns_client.update(sales_order)
