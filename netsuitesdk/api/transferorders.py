@@ -16,6 +16,7 @@ class TransferOrders(ApiBase):
         'subsidiary',
         'location',
         'transferLocation',
+        'customForm',
     ]
 
     READ_ONLY_FIELDS = []
