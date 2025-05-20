@@ -1,4 +1,4 @@
-from lxml import etree
+# from lxml import etree
 from zeep import Plugin
 
 class LoggingPlugin(Plugin):
